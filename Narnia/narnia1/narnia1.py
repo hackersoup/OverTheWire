@@ -8,7 +8,7 @@ import sys
 config = {
         'user': 'narnia1',
         'executable': '/narnia/narnia1',
-        'password_file_path': '/etc/narnia_pass/narnia3',
+        'password_file_path': '/etc/narnia_pass/narnia2',
         'host': 'narnia.labs.overthewire.org',
         'port': 2226
         }
@@ -17,7 +17,7 @@ pwn.context.os = 'linux'
 
 # Get password for SSH login
 try:
-    password = getpass.getpass(prompt='Narnia1 password: ')
+    password = getpass.getpass(prompt='{} password: '.format(config['user']))
 except Exception as e:
     print('[-] Error getting password: ' + e)
     sys.exit(-1)
